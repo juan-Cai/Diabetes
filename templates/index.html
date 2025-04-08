@@ -6,83 +6,144 @@
     <title>Predicción de Diabetes</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"> <!-- Iconos de FontAwesome -->
     <style>
+        /* Estilos generales */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%); /* Fondo degradado */
+            background: linear-gradient(135deg, #6A82FB 0%, #FC5C7D 100%); /* Fondo degradado */
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #333;
+            color: #fff;
         }
 
+        /* Contenedor principal con tarjeta moderna */
         .container {
-            background: rgba(255, 255, 255, 0.9); /* Fondo blanco con opacidad */
+            background: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
+            backdrop-filter: blur(15px); /* Efecto difuminado */
+            border-radius: 15px;
             padding: 40px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
+            max-width: 450px;
             width: 100%;
-            max-width: 400px;
-            backdrop-filter: blur(10px); /* Efecto difuminado */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
             text-align: center;
+            transform: scale(1);
+            transition: transform 0.3s ease-in-out;
         }
 
+        .container:hover {
+            transform: scale(1.05); /* Efecto hover para agrandar el contenedor */
+        }
+
+        /* Título principal */
         h1 {
-            font-size: 2rem;
-            color: #333;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
         }
 
+        /* Estilo para los labels */
         label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
             font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            color: #ddd;
         }
 
+        /* Estilos para los inputs */
         input {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+            padding: 12px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            background-color: #fff;
             font-size: 1rem;
+            color: #333;
+            box-sizing: border-box;
+            transition: border 0.3s ease;
         }
 
+        input:focus {
+            border-color: #6A82FB; /* Color de borde en foco */
+            outline: none;
+        }
+
+        /* Botón de envío */
         button {
             width: 100%;
-            padding: 12px;
-            background-color: #4CAF50;
-            color: white;
+            padding: 15px;
+            background: linear-gradient(135deg, #6A82FB 0%, #FC5C7D 100%);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
+            color: white;
             font-size: 1.2rem;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background 0.3s ease, transform 0.3s ease;
         }
 
         button:hover {
-            background-color: #45a049;
+            transform: translateY(-3px); /* Efecto de levantamiento */
+            background: linear-gradient(135deg, #FC5C7D 0%, #6A82FB 100%); /* Cambio en el gradiente */
         }
 
+        button:active {
+            transform: translateY(1px); /* Efecto al hacer clic */
+        }
+
+        /* Icono de salud al inicio */
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #FC5C7D;
+            animation: pulse 1.5s infinite; /* Animación del ícono */
+        }
+
+        /* Animación de pulsación */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Estilo para mostrar el resultado */
         .result {
             margin-top: 20px;
-            font-size: 1.2rem;
-            color: #333;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #6A82FB;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            opacity: 0;
+            transform: translateY(30px);
         }
 
-        .icon {
-            font-size: 2.5rem;
-            color: #4CAF50;
-            margin-bottom: 15px;
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Transición de entrada de los resultados */
+        .result i {
+            margin-right: 10px;
+            font-size: 2rem;
+            color: #fff;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <i class="fas fa-heartbeat icon"></i> <!-- Icono de corazón (para representar salud) -->
+        <i class="fas fa-heartbeat icon"></i> <!-- Icono de corazón (salud) -->
         <h1>Predicción de Diabetes</h1>
         <form action="/predecir" method="POST">
             <label for="edad">Edad:</label>
@@ -95,10 +156,21 @@
         </form>
 
         {% if mensaje %}
-        <div class="result">
+        <div class="result show">
+            <i class="fas fa-check-circle"></i> <!-- Icono de confirmación -->
             <h2>{{ mensaje }}</h2>
         </div>
         {% endif %}
     </div>
+
+    <script>
+        // Script para mostrar el resultado con animación
+        const resultDiv = document.querySelector('.result');
+        if (resultDiv) {
+            setTimeout(() => {
+                resultDiv.classList.add('show');
+            }, 200);
+        }
+    </script>
 </body>
 </html>
